@@ -1,0 +1,94 @@
+SQL> --Test file for Part C Task 1 Triggers 
+SQL> 
+SQL> --MAINTAIN_DRONE_ONLOAN_TRIGGER
+SQL> 
+SQL> --Alter table commands
+SQL> alter table DRONE add (drone_on_loan_count number (4,0) default 0);
+
+Error starting at line : 8 in command -
+alter table DRONE add (drone_on_loan_count number (4,0) default 0)
+Error report -
+ORA-01430: column being added already exists in table
+01430. 00000 -  "column being added already exists in table"
+*Cause:    
+*Action:
+SQL> alter table DRONE modify (drone_on_loan_count NOT NULL);
+
+Error starting at line : 9 in command -
+alter table DRONE modify (drone_on_loan_count NOT NULL)
+Error report -
+ORA-01442: column to be modified to NOT NULL is already NOT NULL
+01442. 00000 -  "column to be modified to NOT NULL is already NOT NULL"
+*Cause:    
+*Action:
+SQL> -- update new column added
+SQL> update DRONE
+  2  set drone_on_loan_count =
+  3     (select count(*) 
+  4      from loan_line
+  5      where loan_line.drone_id=drone.drone_id);
+
+9 rows updated.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> --Test Data for MAINTAIN_DRONE_ONLOAN_TRIGGER
+SQL> 
+SQL> --Original drone_on_loan_count
+SQL> 
+SQL> select drone_id, drone_on_loan_count from drone;
+
+  DRONE_ID DRONE_ON_LOAN_COUNT
+---------- -------------------
+       100                   0
+       101                   0
+       102                   2
+       103                   1
+       104                   0
+       105                   2
+       106                   2
+       107                   1
+       108                   1
+
+9 rows selected. 
+
+SQL> 
+SQL> --Insert a new loan
+SQL> INSERT INTO LOAN (LOAN_ID,LOAN_DATE_TIME,DUE_DATE_TIME,CUST_ID) VALUES 
+  2  (LOAN_ID_SEQUENCE.NEXTVAL,to_date('5/APR/19 13:00:00','DD/MON/RR HH24:MI:SS'),to_date('25/APR/19 13:00:00','DD/MON/RR HH24:MI:SS'),102);
+
+1 row inserted.
+
+SQL> 
+SQL> INSERT INTO LOAN_LINE VALUES (loan_id_sequence.currval, 108);
+
+1 row inserted.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> select drone_id, drone_on_loan_count from drone ;
+
+  DRONE_ID DRONE_ON_LOAN_COUNT
+---------- -------------------
+       100                   0
+       101                   0
+       102                   2
+       103                   1
+       104                   0
+       105                   2
+       106                   2
+       107                   1
+       108                   2
+
+9 rows selected. 
+
+SQL> spool off;

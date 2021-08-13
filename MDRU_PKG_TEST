@@ -1,0 +1,108 @@
+SET ECHO ON;
+
+--ALTER TABLE COMMAND
+
+ALTER TABLE loan ADD (
+    loan_return_date   DATE
+);
+
+SPOOL "MDRU_PKG_TEST_OUTPUT.TXT";
+
+--Test data for task 2.1
+
+--test entry of a working payment
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.insert_new_payment_procedure(100,500,'FIRST PAYMENT',:var_message);
+
+PRINT var_message
+
+--test entry of a working payment; order_balance reaches 0 and order is complete
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.insert_new_payment_procedure(100,500,'SECOND PAYMENT',:var_message);
+
+PRINT var_message
+
+--test entry of a null payment
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.insert_new_payment_procedure(100,500,'FIRST PAYMENT',:var_message);
+
+PRINT var_message
+
+
+--Test data for task 2.2 
+
+SELECT
+    drone_id,
+    drone_on_loan_count
+FROM
+    drone;
+
+--test entry for valid loan_return 
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.manage_loan(100,TO_DATE('19/DEC/18 12:00:00','DD/MON/RR HH24:MI:SS'),:var_message);
+
+PRINT var_message
+
+SELECT
+    drone_id,
+    drone_on_loan_count
+FROM
+    drone;
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.manage_loan(102,TO_DATE('19/DEC/18 12:00:00','DD/MON/RR HH24:MI:SS'),:var_message);
+
+PRINT var_message
+
+SELECT
+    drone_id,
+    drone_on_loan_count
+FROM
+    drone;
+
+--test entry for invalid loan_return 
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.manage_loan(106,TO_DATE('19/DEC/18 12:00:00','DD/MON/RR HH24:MI:SS'),:var_message);
+
+PRINT var_message
+
+--test entry for invalid loan_return (loan has already been returned)
+
+VAR var_message CHAR
+
+EXEC mdru_manage_package.manage_loan(100,TO_DATE('19/DEC/18 12:00:00','DD/MON/RR HH24:MI:SS'),:var_message);
+
+PRINT var_message
+
+
+--Test data for task 2.3
+
+--Get all details out for customer 109.
+
+VAR cus_details_rows refcursor;
+
+EXEC mdru_manage_package.customer_drone_details(109,:cus_details_rows);
+
+PRINT cus_details_rows
+
+--Get all details out for customer 102.
+VAR cus_details_rows refcursor;
+
+EXEC mdru_manage_package.customer_drone_details(102,:cus_details_rows);
+
+PRINT cus_details_rows
+
+SPOOL off;
+
+SET ECHO OFF;

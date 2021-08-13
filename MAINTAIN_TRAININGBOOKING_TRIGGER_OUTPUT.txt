@@ -1,0 +1,66 @@
+SQL> 
+SQL> --Invalid employee ID insert (Employee does not have an RPL)
+SQL> 
+SQL> insert into training_activity values (TRAINING_ID_SEQUENCE.nextval,101,100, to_date('20/MAY/19 12:00:00','DD/MON/RR HH24:MI:SS'),102,2.5,'take surveying videos');
+
+Error starting at line : 44 in command -
+insert into training_activity values (TRAINING_ID_SEQUENCE.nextval,101,100, to_date('20/MAY/19 12:00:00','DD/MON/RR HH24:MI:SS'),102,2.5,'take surveying videos')
+Error report -
+ORA-20001: INVALID EMPLOYEE.
+ORA-06512: at "DSAM0003.MAINTAIN_TRAININGBOOKING", line 32
+ORA-04088: error during execution of trigger 'DSAM0003.MAINTAIN_TRAININGBOOKING'
+
+SQL> 
+SQL> --Valid employee ID insert (Employee has an RPL)
+SQL> 
+SQL> INSERT INTO training_activity (
+  2      training_id,
+  3      emp_id,
+  4      cust_id,
+  5      training_date_time,
+  6      drone_id,
+  7      training_duration
+  8  ) VALUES (
+  9      training_id_sequence.NEXTVAL,
+ 10      100,
+ 11      106,
+ 12      TO_DATE('20/Jan/19 13:00:00','DD/MON/RR HH24:MI:SS'),
+ 13      101,
+ 14      4
+ 15  );
+
+1 row inserted.
+
+SQL> 
+SQL> --Invalid employee ID update (Employee does not have an RPL)
+SQL> 
+SQL> UPDATE training_activity
+  2  SET
+  3      emp_id = 101
+  4  WHERE
+  5      training_id = 100;
+
+Error starting at line : 66 in command -
+UPDATE training_activity
+SET
+    emp_id = 101
+WHERE
+    training_id = 100
+Error report -
+ORA-20001: INVALID EMPLOYEE.
+ORA-06512: at "DSAM0003.MAINTAIN_TRAININGBOOKING", line 32
+ORA-04088: error during execution of trigger 'DSAM0003.MAINTAIN_TRAININGBOOKING'
+
+SQL> 
+SQL> --Valid employee ID update (Employee has an RPL)
+SQL> 
+SQL> UPDATE training_activity
+  2  SET
+  3      emp_id = 100
+  4  WHERE
+  5      training_id = 100;
+
+1 row updated.
+
+SQL> 
+SQL> spool off;
